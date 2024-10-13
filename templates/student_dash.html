@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Student Management System</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Dashboard Card */
+        .dashboard-card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .dashboard-card h2 {
+            color: #0056b3;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 30px;
+            font-weight: 500;
+        }
+
+        /* Subject Marks */
+        .subjects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .subject {
+            background-color: #e6f0ff;
+            padding: 20px;
+            border-radius: 8px;
+            width: calc(50% - 20px);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #d0d9e0;
+        }
+
+        .subject:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .subject h3 {
+            margin-bottom: 12px;
+            color: #007bff;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .subject p {
+            font-size: 26px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Total Score */
+        .total-score {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 26px;
+            color: #0056b3;
+            font-weight: 600;
+        }
+
+        /* Button Styling */
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* Footer Styling */
+        .footer {
+            background-color: #f0f4f8;
+            padding: 20px;
+            text-align: center;
+            margin-top: auto;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer p {
+            margin: 0;
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .subjects {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .subject {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h1>Student Dashboard</h1>
+    </header>
+    <div class="main">
+        {% if student %}
+        <div class="dashboard-card">
+            <h2>Academic Performance</h2>
+            <div class="subjects">
+                <div class="subject">
+                    <h3>Math</h3>
+                    <p>{{ student.math }}</p>
+                </div>
+                <div class="subject">
+                    <h3>Arabic</h3>
+                    <p>{{ student.arabic }}</p>
+                </div>
+                <div class="subject">
+                    <h3>English</h3>
+                    <p>{{ student.english }}</p>
+                </div>
+                <div class="subject">
+                    <h3>Science</h3>
+                    <p>{{ student.science }}</p>
+                </div>
+                <div class="subject">
+                    <h3>Social Studies</h3>
+                    <p>{{ student.social_studies }}</p>
+                </div>
+                <div class="subject">
+                    <h3>Grade</h3>
+                    <p>{{ student.grades }}</p>
+                </div>
+            </div>
+            <div class="total-score">
+                <strong>Total:</strong> {{ student.total }}
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{{ url_for('complain') }}" class="btn">Make a Complaint</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="dashboard-card">
+            <h2>No Marks Available</h2>
+            <p>You do not have any marks recorded yet.</p>
+        </div>
+        {% endif %}
+    </div>
+    <footer class="footer">
+        <p>&copy; 2024 Student Management System</p>
+    </footer>
+</body>
+
+</html>

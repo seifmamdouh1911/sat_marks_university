@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Student Management System</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 40px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #0056b3;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #003d80;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .main {
+                padding: 20px;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 10px 0;
+                font-size: 16px;
+            }
+
+            table, th, td {
+                font-size: 14px;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Welcome, {{ current_user.name }}</h1>
+    </header>
+    <div class="main">
+        {% if current_user.role == "teacher" %}
+            <a href="/add_student" class="btn">Add New Student</a>
+            <a href="/manage_students" class="btn">Manage Students</a>
+        {% elif current_user.role == "student" %}
+            <a href="/student_dash" class="btn">View Your Dashboard</a>
+            <a href="/complain" class="btn">Make a Complaint</a>
+        {% elif current_user.role == "admin" %}
+            <a href="/admin_dashboard" class="btn">Admin Dashboard</a>
+        {% endif %}
+
+        {% if current_user.role == "teacher" %}
+            <h2>Student Complaints</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Subject</th>
+                        <th>Mark</th>
+                        <th>Complaint</th>
+                        <th>Date Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                        <tr>
+                            <td>{{ complaint.user.name }}</td>
+                            <td>{{ complaint.subject }}</td>
+                            <td>{{ complaint.mark }}</td>
+                            <td>{{ complaint.complaint_text }}</td>
+                            <td>{{ complaint.date_submitted.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                <button class="btn" onclick="openModal({{ complaint.id }})">Edit</button>
+                                <form action="{{ url_for('reject_complaint', complaint_id=complaint.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No complaints available.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+    <footer class="footer">
+        &copy; 2024 Student Management System
+    </footer>
+
+    <!-- Modal for Editing Complaints -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Edit Complaint</h2>
+            <form id="editForm" action="{{ url_for('edit_complaint') }}" method="POST">
+                <input type="hidden" id="complaint_id" name="complaint_id">
+                <label for="new_mark">New Mark:</label>
+                <input type="number" id="new_mark" name="new_mark" required>
+                <button type="submit" class="btn">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(complaint_id) {
+            document.getElementById('complaint_id').value = complaint_id;
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('editModal')) {
+                document.getElementById('editModal').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
